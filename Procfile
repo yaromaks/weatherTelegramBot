@@ -1,1 +1,1 @@
-web: java -jar target/FirstTelegramBot-1.0-SNAPSHOT.jar
+worker: java -jar target/FirstTelegramBot-1.0-SNAPSHOT.jar
