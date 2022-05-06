@@ -5,6 +5,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class Weather {
 
@@ -16,6 +19,7 @@ public class Weather {
     private String output;
     private String mainWeather;
     public String translateMainWeather;
+    public String getUnixSunrise;
     public String sunriseTime;
     public String sunsetTime;
     public String changeLog;
@@ -88,12 +92,30 @@ public class Weather {
     public String getSunriseTime() {
         if (!output.isEmpty()) {
             JSONObject obj = new JSONObject(output);
-            sunriseTime = String.valueOf(obj.getJSONObject("main").getDouble("temp"));
+            long getUnixSunrise = (long) obj.getJSONObject("sys").getDouble("sunrise");
+            System.out.println(getUnixSunrise);
+            sunriseTime = convertUnixToDate(getUnixSunrise);
+
             isCityExist = true;
         } else {
             isCityExist = false;
         }
         return sunriseTime;
+    }
+
+    // Получение данных о заходе солнца из JSON ответа
+    public String getSunsetTime() {
+        if (!output.isEmpty()) {
+            JSONObject obj = new JSONObject(output);
+            long getUnixSunset = (long) obj.getJSONObject("sys").getDouble("sunset");
+            System.out.println(getUnixSunset);
+            sunsetTime = convertUnixToDate(getUnixSunset);
+
+            isCityExist = true;
+        } else {
+            isCityExist = false;
+        }
+        return sunsetTime;
     }
 
 
@@ -167,13 +189,14 @@ public class Weather {
         return content.toString();
     }
 
+    // Получение данных о погоде в городах которые введены вручную пользователем
     public String anotherCity(){
         String tempCity = this.city;
         getWeather();
         String response;
         if(!output.isEmpty()){
             System.out.println(output);
-            response = "Сейчас в городе " + tempCity + ": " + MainWeather() +"\nТемпература: " + getTemperature() + " °С\nВлажность: " + getHumidity()  +  " %\nОблачность: " + getCloudiness() + " %\nСкорость ветра: " + getWindSpeed() + " м/с";
+            response = "Сейчас в городе " + tempCity + ": " + MainWeather() +"\nТемпература: " + getTemperature() + " °С\nВлажность: " + getHumidity()  +  " %\nОблачность: " + getCloudiness() + " %\nСкорость ветра: " + getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + getSunriseTime()  + "\nЗаход солнца ожидается в: " + getSunsetTime();
         } else {
             System.out.println(output);
             response = "Не найден город с таким названием";
@@ -181,6 +204,7 @@ public class Weather {
         return response;
     }
 
+    // Чтение changelog файла
     public String readFromChangelogFile() throws IOException {
         String path = "./src/main/resources/changeLog.txt";
 
@@ -198,4 +222,14 @@ public class Weather {
 
         return changeLog;
     }
+
+    // конвертация unix в формат (часы, минуты)
+    public String convertUnixToDate(long getUnixSunrise){
+        Date date = new Date(getUnixSunrise*1000L);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        String javaDate = sdf.format(date);
+        return javaDate;
+    }
+
 }

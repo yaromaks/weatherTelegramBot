@@ -76,15 +76,15 @@ public class Bot extends TelegramLongPollingBot {
             switch (message.getText()){
                 case "Киев":
                     weather.getWeather();
-                    sendMsg(message, "В Киеве сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с");
+                    sendMsg(message, "В Киеве сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
                     break;
                 case "Одесса":
                     weather.getWeather();
-                    sendMsg(message, "В Одессе сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() +  " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с");
+                    sendMsg(message, "В Одессе сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() +  " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
                     break;
                 case "Харьков":
                     weather.getWeather();
-                    sendMsg(message, "В Харькове сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с");
+                    sendMsg(message, "В Харькове сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
                     break;
                 case "/start":
                     sendMsg(message, "Доброго времени суток. Я прототип бота-синоптика версии 1.0 \nПока я умею не много, но уверен мой хозяин в скором времени добавит мне новые функции");
