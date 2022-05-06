@@ -93,7 +93,6 @@ public class Bot extends TelegramLongPollingBot {
                     sendMsg(message, "ѕока что у мен€ нету настроек. \nЌо создатель обещал сделать их в следующих верси€х");
                     break;
                 case "/changelog":
-                    sendMsg(message, "—коро здесь будет changelog где можно будет посмотреть все изменени€ и обновлени€ этого бота");
                     try {
                         sendMsg(message, weather.readFromChangelogFile());
                     } catch (IOException e) {
@@ -106,5 +105,4 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
     }
-
 }
