@@ -1,1 +1,1 @@
-web: java src/main/java/Main
+web: java -jar target/FirstTelegramBot-1.0-SNAPSHOT.jar
