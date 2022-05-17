@@ -1,17 +1,12 @@
-import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,45 +58,49 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-
-
-
     public void onUpdateReceived(Update update) {
         // Проверяем есть ли в обновлении сообщение и в сообщении есть текст
         Message message = update.getMessage();
         Weather weather = new Weather(message.getText());
+        String userFullName = message.getChat().getFirstName() + " " +  message.getChat().getLastName();
+        Weather weatherWithName = new Weather(message.getText(), userFullName);
 
         if (message !=null && message.hasText()) {
 
-            switch (message.getText()){
-                case "Киев":
+            switch (message.getText()) {
+                case "Киев" -> {
+                    System.out.println(userFullName + ":\nГород: Киев\n");
                     weather.getWeather();
-                    sendMsg(message, "В Киеве сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
-                    break;
-                case "Одесса":
+                    String kievInfo = "В Киеве сейчас: " + weather.MainWeather() + "\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime() + "\nЗаход солнца ожидается в: " + weather.getSunsetTime() + "\nЧасовой пояс: " + weather.getGMT();
+                    sendMsg(message, kievInfo);
+                    System.out.println(kievInfo);
+                    System.out.println("--------------------------------------------------------------------------------------------------\n \n \n " );
+                }
+                case "Одесса" -> {
+                    System.out.println(userFullName + ":\nГород: Одесса\n");
                     weather.getWeather();
-                    sendMsg(message, "В Одессе сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() +  " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
-                    break;
-                case "Харьков":
+                    String odessaInfo = "В Одессе сейчас: " + weather.MainWeather() + "\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime() + "\nЗаход солнца ожидается в: " + weather.getSunsetTime() + "\nЧасовой пояс: " + weather.getGMT();
+                    sendMsg(message, odessaInfo);
+                    System.out.println(odessaInfo);
+                    System.out.println("--------------------------------------------------------------------------------------------------\n \n \n " );
+                }
+                case "Харьков" -> {
+                    System.out.println(userFullName + ":\nГород: Харьков\n");
                     weather.getWeather();
-                    sendMsg(message, "В Харькове сейчас: " + weather.MainWeather() +"\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime()  + "\nЗаход солнца ожидается в: " + weather.getSunsetTime());
-                    break;
-                case "/start":
-                    sendMsg(message, "Доброго времени суток. Я прототип бота-синоптика версии 1.0 \nПока я умею не много, но уверен мой хозяин в скором времени добавит мне новые функции");
-                    break;
-                case "/settings":
-                    sendMsg(message, "Пока что у меня нету настроек. \nНо создатель обещал сделать их в следующих версиях");
-                    break;
-                case "/changelog":
-                    try {
-                        sendMsg(message, weather.readFromChangelogFile());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    sendMsg(message, weather.anotherCity());
-                    System.out.println();
+                    String kharkovInfo = "В Харькове сейчас: " + weather.MainWeather() + "\nТемпература: " + weather.getTemperature() + " °С\nВлажность: " + weather.getHumidity() + " %\nОблачность: " + weather.getCloudiness() + " %\nСкорость ветра: " + weather.getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + weather.getSunriseTime() + "\nЗаход солнца ожидается в: " + weather.getSunsetTime() + "\nЧасовой пояс: " + weather.getGMT();
+                    sendMsg(message, kharkovInfo);
+                    System.out.println(kharkovInfo);
+                    System.out.println("--------------------------------------------------------------------------------------------------\n \n \n " );
+                }
+                case "/start" -> sendMsg(message, """
+                        Доброго времени суток. Я прототип бота-синоптика версии 1.9\s
+                        Пока я умею не много, но уверен мой хозяин в скором времени добавит мне новые функции\s
+                        Что бы узнать погоду в вашем городе, просто отправьте мне его название или выберите один из предложенных вариантов\s
+                        Так же что бы узнать все нововведения, вы можете написать /changelog""");
+
+                case "/settings" -> sendMsg(message, "Пока что у меня нету настроек. \nНо создатель обещал добавить их в следующих версиях");
+                case "/changelog" -> sendMsg(message, weather.changeLogOutput());
+                default -> sendMsg(message, weatherWithName.anotherCity());
             }
         }
     }

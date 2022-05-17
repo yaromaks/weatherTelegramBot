@@ -12,22 +12,25 @@ import java.util.TimeZone;
 public class Weather {
 
     private String city;
+    private String fullUserName;
     public String temperature;
     public String humidity;
     public String cloudiness;
     public String windSpeed;
-    private String output;
-    private String mainWeather;
+    public String output;
     public String translateMainWeather;
-    public String getUnixSunrise;
+    public String timeInGmt;
     public String sunriseTime;
     public String sunsetTime;
     public String changeLog;
     boolean isCityExist = true;
 
+    public Weather(){}
     public Weather(String city){
         this.city = city;
     }
+    public Weather(String city, String fullUserName){this.city = city; this.fullUserName = fullUserName;}
+
 
     /* Ответ от сервера об основной информации о погоде приходит на английском языке.
     А при попытке добавить в запрос аргумент lang=ru, возникает проблема.
@@ -40,34 +43,18 @@ public class Weather {
     public String MainWeather(){
         if (!output.isEmpty()) {
             JSONObject obj = new JSONObject(output);
-            System.out.println(obj.getJSONArray("weather").getJSONObject(0).getString("main"));
-            mainWeather = String.valueOf(obj.getJSONArray("weather").getJSONObject(0).getString("main"));
+            String mainWeather = String.valueOf(obj.getJSONArray("weather").getJSONObject(0).getString("main"));
 
             //Перевод значения погоды с английского на русский
-            switch (mainWeather){
-                case "Rain":
-                    translateMainWeather = "Дождь";
-                    break;
-                case "Thunderstorm":
-                    translateMainWeather = "Гроза";
-                    break;
-                case "Drizzle":
-                    translateMainWeather = "Морось";
-                    break;
-                case "Snow":
-                    translateMainWeather = "Снег";
-                    break;
-                case "Clear":
-                    translateMainWeather = "Ясно";
-                    break;
-                case "Clouds":
-                    translateMainWeather = "Облачно";
-                    break;
-                default:
-                    translateMainWeather = "";
+            switch (mainWeather) {
+                case "Rain" -> translateMainWeather = "Дождь";
+                case "Thunderstorm" -> translateMainWeather = "Гроза";
+                case "Drizzle" -> translateMainWeather = "Морось";
+                case "Snow" -> translateMainWeather = "Снег";
+                case "Clear" -> translateMainWeather = "Ясно";
+                case "Clouds" -> translateMainWeather = "Облачно";
+                default -> translateMainWeather = "";
             }
-
-            System.out.println(translateMainWeather);
 
             isCityExist = true;
         } else {
@@ -91,9 +78,9 @@ public class Weather {
     // Получение данных о восходе солнца из JSON ответа
     public String getSunriseTime() {
         if (!output.isEmpty()) {
+            getGMT();
             JSONObject obj = new JSONObject(output);
             long getUnixSunrise = (long) obj.getJSONObject("sys").getDouble("sunrise");
-            System.out.println(getUnixSunrise);
             sunriseTime = convertUnixToDate(getUnixSunrise);
 
             isCityExist = true;
@@ -108,7 +95,6 @@ public class Weather {
         if (!output.isEmpty()) {
             JSONObject obj = new JSONObject(output);
             long getUnixSunset = (long) obj.getJSONObject("sys").getDouble("sunset");
-            System.out.println(getUnixSunset);
             sunsetTime = convertUnixToDate(getUnixSunset);
 
             isCityExist = true;
@@ -162,9 +148,7 @@ public class Weather {
     // Запрос на сервер openWeatherMap для получений полного отчёта о погоде в JSON формате
     public void getWeather() {
         city = URLEncoder.encode(city, StandardCharsets.UTF_8);
-        String output = getUrlContent("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=57a6d6faf9702432eed0384f4a9283ea&units=metric");
-        System.out.println(output);
-        this.output = output;
+        this.output = getUrlContent("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=57a6d6faf9702432eed0384f4a9283ea&units=metric");
     }
 
     // Метод для использования веб-запросов
@@ -195,41 +179,56 @@ public class Weather {
         getWeather();
         String response;
         if(!output.isEmpty()){
-            System.out.println(output);
-            response = "Сейчас в городе " + tempCity + ": " + MainWeather() +"\nТемпература: " + getTemperature() + " °С\nВлажность: " + getHumidity()  +  " %\nОблачность: " + getCloudiness() + " %\nСкорость ветра: " + getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + getSunriseTime()  + "\nЗаход солнца ожидается в: " + getSunsetTime();
+            tempCity = tempCity.substring(0, 1).toUpperCase() + tempCity.substring(1);
+            System.out.println(fullUserName + ":\nГород: " + tempCity + "\n");
+            response = "Сейчас в городе " + tempCity + ": " + MainWeather() +"\nТемпература: " + getTemperature() + " °С\nВлажность: " + getHumidity()  +  " %\nОблачность: " + getCloudiness() + " %\nСкорость ветра: " + getWindSpeed() + " м/с" + "\nВосход солнца ожидается в: " + getSunriseTime()  + "\nЗаход солнца ожидается в: " + getSunsetTime() + "\nЧасовой пояс: " + timeInGmt;
+            System.out.println(response);
+            System.out.println("--------------------------------------------------------------------------------------------------\n \n \n " );
         } else {
-            System.out.println(output);
             response = "Не найден город с таким названием";
         }
         return response;
     }
 
-    // Чтение changelog файла
-    public String readFromChangelogFile() throws IOException {
-        String path = "./src/main/resources/changeLog.txt";
-
-        DataInputStream dis = new DataInputStream(new FileInputStream(path));
-
-        byte[] buffer = new byte[512];
-        while (dis.available() != 0){
-            int count = dis.read(buffer);
-
-            if(count > 0){
-                System.out.println(new String(buffer));
-                changeLog = new String(buffer);
-            }
-        }
+    // выводим changeLog (все версии и обновления бота)
+    public String changeLogOutput(){
+        changeLog = """
+                v1.0 - бот умеет отправлять данные о температуре, влажности и скорости ветра в 3 городах которые можно выбрать кнопками.
+                v1.1 - добавлена поддержка ввода с клавиатуры любого города НА ЛЮБОМ ЯЗЫКЕ. Исправлены мелкие ошибки и баги
+                v1.2 - добавлен показатель об общем состоянии погоды (Ясно, солнечно, дожди)
+                v1.3 - добавлен показатель облачности
+                v1.4 - добавлена команда /changelog
+                v1.5 - проект выложен на GitHub
+                v1.6 - добавлены данные о восходе и заходе солнца
+                v1.7 - добавлена привязка к часовому поясу и его вывод
+                v1.8 - исправлены мелкие баги и добавлена всплывающая подсказка при введении команд
+                v1.9 - при выборе другого города, его название пишеться с большой буквы""";
+        System.out.println(changeLog);
 
         return changeLog;
     }
+
+    // получение часового пояса в GMT формате
+    public String getGMT(){
+        if (!output.isEmpty()) {
+            Time time = new Time();
+            timeInGmt = time.secToGmt(output);
+
+            isCityExist = true;
+        } else {
+            isCityExist = false;
+        }
+
+        return timeInGmt;
+    }
+
 
     // конвертация unix в формат (часы, минуты)
     public String convertUnixToDate(long getUnixSunrise){
         Date date = new Date(getUnixSunrise*1000L);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-        String javaDate = sdf.format(date);
-        return javaDate;
+        sdf.setTimeZone(TimeZone.getTimeZone(timeInGmt));
+        return sdf.format(date);
     }
 
 }
